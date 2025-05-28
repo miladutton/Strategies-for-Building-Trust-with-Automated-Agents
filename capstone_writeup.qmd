@@ -1,0 +1,1714 @@
+---
+title: "Strategies for Building Trust with Automated Agent Systems"
+author: "Mila Dutton & Hui Junyi"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+format: pdf
+editor: visual
+toc: true
+toc_depth: 3
+---
+
+```{r, echo=TRUE}
+# Global options to suppress all code, warnings and messages
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(warn = -1)  # Suppresses all warnings globally in R
+suppressWarnings(suppressMessages({
+  library(quanteda)
+  library(quanteda.textplots)
+  library(RColorBrewer)
+  library(textdata)
+}))
+```
+
+## Cover Letter
+
+**STRATEGIES FOR BUILDING TRUST WITH AUTOMATED AGENT SYSTEMS**\
+Mila Dutton & Hui Junyi
+
+**Supplementary Materials**\
+• Experiment: <https://sheepqueen422.github.io/chatbot/chatbot.html>\
+• Raw data files: <https://drive.google.com/file/d/1bX1LqpczhgOePygc3kqN0omnBBUxA0ro/view?usp=share_link>
+
+**Recommended Reading Path**\
+Begin with the Introduction (p. 3) for research context, then proceed to Results (p. 11) for key findings and Discussion (p. 40) for implications. Technical implementation details are in Appendices A and D (p. 45(.
+
+**Author Contributions**\
+Mila Dutton led the data collection and quantitative and qualitative analysis (ANOVA, post-hoc tests, sentiment coding, thematic analysis). Hui Junyi handled agent implementation (Eleven Labs/OpenAI API) and qualitative analysis (sentiment coding, thematic analysis), Both authors contributed equally to all other aspects including literature reviews, experimental design, report writing, and final edits.
+
+We are confident this work provides actionable insights for designing emotionally intelligent CAs, particularly in high-stakes domains like healthcare
+
+**Contact**
+
+midutton\@ucsd.edu
+
+hjunyi\@ucsd.edu
+
+## Abstract
+
+Voice-based conversational agents (CAs) are increasingly integrated into healthcare and other domains, yet their lack of emotional intelligence often leads to unnatural and disengaging interactions. This study explores the development of emotionally intelligent voice CAs (EIVCAs) by altering conversational styles such as tone, speed, pauses, etc. By enhancing conversational abilities, this research aims to improve user engagement and trust in healthcare-specific chat bots. Through these improvements, this work aims to advance the adoption of CAs in healthcare, where trust and effective communication are essential for positive patient outcomes.
+
+Keywords: Voice-based conversational agents, Artificial intelligence, Language
+
+## Introduction
+
+Effective communication systems are a cornerstone of the healthcare industry, ensuring the seamless management of patients and procedures. However, the sheer volume of administrative tasks often poses significant challenges such as staff burnout, errors, and delays. In recent years there has been a shift toward utilizing conversational AI, such as chatbots and voice assistants (VAs), across various domains to help improve such processes and reduce the administrative workload. These automated systems can assist with tasks such as: scheduling appointments, answering questions, and collecting patient information. Unlike human workers, these agents can constantly operate without fatigue, thus allowing for a high volume of consistent, accurate, and timely assistance. 
+
+However, despite their utility, conversational agents can fall short in meeting user expectations for natural and relatable interactions. This shortcoming is particularly critical in healthcare, where trust and empathy are essential. Robotic, emotionless interactions can lead to user dissatisfaction, disengagement, and ultimately, a lack of trust in these systems.
+
+Emotionally intelligent conversational agents (EICAs) that integrate emotional perception and expression capabilities represent a promising solution to this challenge. By incorporating emotional cues, context-aware responses, and human-like conversational elements, EICAs can bridge the gap between user expectations and the limitations of current CAs. This study focuses on optimizing a healthcare-specific agent developed for a leading AI digital vendor in the healthcare space, by exploring how communication styles and emotional cues affect user trust, engagement, and task completion. Specifically, our research investigates how varying the tone, speed, vocabulary, and emotional expression to different degrees of friendliness and professionalism influences the user's experience, aiming to enhance both enjoyment and effectiveness. Through this research, we hope to gain foundational knowledge in the role of conversational agents in the healthcare industry, thus contributing to more effective implementation of such agents.
+
+Based on prior work in emotionally intelligent CAs, we test the following hypotheses:
+
+H1: The Friendly Agent will elicit significantly higher user engagement and emotional connection scores than the Moderate and Professional Agents.
+
+H2: Engagement scores will be rated higher than emotional scores across all agent types, regardless of conversational style.
+
+H3: Linguistic analysis of free-response feedback will reveal more positive sentiment and emotional terms (e.g., "enjoyed," "natural") for the Friendly Agent compared to other versions.
+
+### Related Work
+
+### Conversational Agents
+
+Conversational agents (CAs) are dialogue systems capable of understanding and generating natural language through text, voice, or gestures. While often used interchangeably, "chatbots" are a subset of CAs, primarily text-based systems designed for task specific or open ended interactions. Virtual assistants like Siri and Alexa extend these capabilities to include voice interactions and actions like setting reminders or controlling devices. Embodied conversational agents (ECAs), such as JIBO, further enhance communication with physical gestures or graphical representations (Adamopoulou & Moussiades, 2020). CAs are categorized by communication mode, action capabilities, and application domain:
+
+-   Communication only agents (e.g., ELIZA) focus on interacting with users (Allouch et al., 2021).
+
+-   Action capable agents (e.g., Siri) perform tasks alongside communication.
+
+-   Applications include open-domain agents (general-purpose Q&A), goal-oriented systems (booking appointments), social-supporting agents (healthcare), and social-network bots (marketing). 
+
+Historically, systems like ELIZA and PARRY relied on simple rule-based designs. Modern advancements in Artificial Intelligence (AI), Natural Language Processing (NLP), and machine learning enable dynamic, context-aware responses, making interactions more human-like and adaptable (Adamopoulou & Moussiades, 2020; Bălan, 2023).
+
+#### ***Technologies for Basic Chatbots***
+
+Core components of chatbots include:
+
+-   Natural Language Processing (NLP): Processes user input using tokenization, lemmatization, and sentiment analysis. For voice-based agents, speech recognition is also employed (Bilquise et al., 2022).
+
+-   Natural Language Understanding (NLU): Interprets user intent and context from structured data.
+
+-   Dialog Manager: Maintains conversational context and determines responses via templates, APIs, or databases.
+
+-   Natural Language Generator (NLG): Produces responses using rule-based, retrieval-based, or generative models.
+
+Modern chatbot technologies leverage deep learning models for improved performance:
+
+-   Recurrent Neural Networks (RNNs) capture sequential language patterns but struggle with long-term dependencies (Wardhana et al., 2021).
+
+-   Sequence-to-Sequence (Seq2Seq) models use encoder-decoder frameworks for contextually relevant responses but often fail to replicate human-like conversations.
+
+-   Long Short-Term Memory (LSTM) networks overcome RNN limitations by retaining long-term information, improving context retention.
+
+-   Conditional Variational Autoencoders (CVAE) enhance response diversity by learning latent conversational intents (Liu et al., 2021).
+
+The trend in chatbot development is shifting from retrieval-based to generative approaches, focusing on neural network models like GPT and BERT to create diverse, contextually appropriate responses (Pamungkas, 2019).
+
+### **Emotional Intelligence of CAs**
+
+Despite technological advancements, many users still disengage from conversational agents (CAs) due to their lack of emotional intelligence and natural conversational flow. Emotional cues—such as tone, sentiment, and empathy—are critical in building trust, engagement, and satisfaction (Hong et al., 2023). Research indicates that a large portion of user interactions, especially in social media and customer service contexts, involves emotional exchanges rather than purely informational ones (Xu et al., 2017). For example, emotionally enriched responses can uplift user moods, improve relationships, and foster natural, engaging conversations.
+
+Emotions are a critical component of effective communication. Studies reveal that users are more likely to engage with CAs capable of perceiving and responding empathetically (Hong et al., 2023; Nass & Moon, 2000). The absence of these interpersonal qualities often results in frustration and reduced adoption rates. This gap highlights the need for emotionally intelligent conversational agents (EICAs) that bridge the divide between user expectations and the technology's capabilities.
+
+Despite their utility, CAs face challenges in user engagement and trust, particularly in domains requiring empathy and nuanced communication. Nass and Moon (2000) found that users apply human social rules to CAs, suggesting that traits like attentiveness, humor, and emotional expressiveness enhance user experiences. In healthcare, where effective communication is critical, these elements are essential for building trust and ensuring task completion. Emotional intelligence can help create rapport, comfort, and confidence in users, making tasks more efficient and interactions more fulfilling.
+
+The PEACE framework (Politeness, Entertainment, Attentive Curiosity, Empathy) further underscores the importance of interpersonal qualities in conversational agents (Svikhnushina & Pu, 2022). By demonstrating these qualities, EICAs can reduce communication breakdowns, enhance user satisfaction, and build trust—key factors in sensitive domains like healthcare. Recent research has emphasized integrating emotional intelligence into CAs through adaptive conversational strategies, varied tones, and empathic responses.
+
+As organizations increasingly invest in AI-powered conversational systems, incorporating emotional intelligence into chatbots is essential for enhancing user engagement and trust. Particularly in healthcare, emotionally intelligent chatbots hold the potential to facilitate better communication, leading to improved outcomes and user experiences.
+
+### **Technologies for Emotional CAs**
+
+Emotional Perception Technology:**\
+** Emotion perception technology focuses on enabling CAs to detect and interpret the emotional states of users. This involves techniques like:
+
+-   Valence-Arousal-Dominance (VAD) embeddings: Associating words with emotional intensity and meaning.
+
+-   Speech Emotion Recognition (SER): Utilizing acoustic signals to classify emotions, allowing the agent to adapt its responses dynamically (Hu et al., 2021).
+
+SER models often utilize deep learning architectures such as Convolutional Neural Networks (CNNs) and Long Short-Term Memory (LSTM) networks for emotion detection. However, while recognizing emotions is a critical first step, emotional intelligence also requires appropriate emotional expression to create meaningful and engaging interactions.
+
+Emotional Expression Technology:**\
+** Emotionally intelligent chatbots use advanced neural models to express emotions and generate contextually appropriate responses. Techniques include:
+
+-   Seq2Seq and CVAE models: Generating emotionally enriched and diverse responses (Liu et al., 2021).
+
+-   Transformer-based architectures (e.g., GPT): Producing highly context-aware and empathic responses.
+
+Strategies to enhance emotional expression include:
+
+-   Positive reinforcement: Using praise or encouragement to motivate users.
+
+-   Emotion regulation techniques: Addressing negative emotions with distraction or reappraisal strategies.
+
+-   Nonverbal cues: Incorporating interjections (e.g., "wow!", "hmm") and fillers to convey empathy and maintain conversational flow (Asghar et al., 2018).
+
+Despite significant advancements, challenges remain in integrating emotional perception and expression technologies seamlessly. Current research emphasizes the need to combine these approaches to create cohesive and emotionally intelligent systems. In healthcare, such systems could significantly improve user trust, engagement, and overall satisfaction.
+
+## Methods
+
+### Participants
+
+Participants were recruited through the online platform Prolific. This specific platform was chosen as it is known for higher quality data and minimal bots. The only criteria for participation is that participants must be fluent in English. Additionally, participants must have a minimum approval rate of 95% for the studies to which they apply, ensuring that they are engaged and committed to providing reliable, high-quality data.
+
+### Design
+
+This study utilizes a within subjects design, where each participant interacts with all experimental conditions. The conditions represent three different versions of the digital assistant: friendly, moderate, and professional. The three versions of the speech to speech agent differ primarily in their communication style, tailored to suit distinct conversational contexts. The Professional Agent maintains a relaxed and informative tone, featuring a neutral style, stable pitch, and a slightly reduced speaking rate to enhance clarity. With precise articulation, professional vocabulary, and minimal emotional variation, it is well suited for business and structured interactions. The Moderate Agent offers a warm and engaging presence, balancing professionalism with approachability. It uses a natural pace, a stable pitch, and subtle expressiveness to create a calm yet inviting conversational style. Its articulation is smooth, and its vocabulary remains accessible, making it ideal for balanced, supportive discussions. Meanwhile, the Friendly Agent is designed for casual and lively conversations, featuring an upbeat and clear tone. With a higher pitch, faster rate, and expressive emotion, it fosters an engaging and dynamic experience, perfect for informal and cheerful interactions.
+
+The qualitative dependent variables consist of free response answers that capture participants' experiences with each agent version. Quantitative dependent variables include Likert scale ratings measuring engagement and emotional connection.
+
+### **Agent Selection & Implementation**
+
+To identify a suitable agent development platform, several leading options were reviewed, including Google DialogFlow, Facebook wit.ai, Microsoft LUIS, IBM Watson Conversation, Amazon Lex, and SAP Conversation AI. Additional platforms like RASA, Botsify, Chatfuel, Manychat, Flow XO, Chatterbot, Pandorabots, Botkit, and Botlytics were also considered. After thorough comparison, LiveKit, VoiceNote.AI, and Microsoft Azure were selected as the potential implementation platforms due to their customizability. Fully coded versions of both a Microsoft Azure and Eleven Labs agent were built, as well as their front end websites for user applications. After comparing both, and receiving feedback, the Eleven Labs agent was selected.
+
+### **Materials**
+
+#### ***Eleven Labs Agent***
+
+The Eleven Labs Agent was selected for its advanced AI-driven text-to-speech capabilities, offering high-quality, natural-sounding voices that enhance conversational experiences. Eleven Labs' platform specializes in lifelike speech synthesis, allowing agents to deliver expressive and dynamic interactions. Its AI-driven voice models provide smooth articulation, emotion control, and customizable parameters like pitch, stability, and speed, making it ideal for studying how different speaking styles impact user engagement and trust.
+
+The agent was developed in Python, utilizing Open AI’s API to integrate text-to-speech functionality seamlessly. Since Eleven Labs provides state-of-the-art voice synthesis models, the chatbot does not require extensive speech training, instead relying on these pre-trained models to generate natural, engaging dialogue in real time.
+
+#### ***Agent Version Specifications***
+
+Three versions of the agent were created, each representing a different communication style:
+
+-   Professional – formal tone, structured vocabulary, steady pacing
+
+-   Moderate – balanced tone, conversational but clear, moderate pacing
+
+-   Friendly – relaxed tone, casual vocabulary, upbeat pacing.
+
+    The agents vary in tone, pacing, and vocabulary (see Appendix A). They do not require training, as the Eleven Labs platform provides pre-trained models and customizable templates. This enables efficient deployment without extensive data collection or training time, allowing the study to focus on testing how communication style impacts user outcomes.
+
+#### ***Agent Conversational Prompts***
+
+The agents engage participants in natural healthcare conversations, asking questions about wellness and lifestyle habits that mirror real world healthcare interactions. While Appendix B contains a comprehensive set of potential prompts aligned with each communication style, these serve as flexible conversation starters rather than a rigid script. The conversations unfold organically, with agents selecting contextually appropriate questions rather than working through a predetermined list. This approach creates authentic dialogue rather than formal interviews, allowing participants to ask their own questions and redirect conversations as desired. This dynamic interaction provides valuable insight into how participants perceive and respond to different communication styles, ultimately revealing their impact on the overall experience.
+
+#### ***Agent Interaction Assessment***
+
+The Agent Interaction Assessment is designed to measure the participants experience interacting with the agent. Detailed descriptions of the assessment metrics and scoring criteria can be found in Appendix C, ensuring clarity and reproducibility of the evaluation process. Both free response and likert scale items are included allowing for qualitative and quantitative analysis. These questions aim to capture a comprehensive view of the participants' experiences, focusing both on measurable aspects (Engagement and Approachability, Emotional Connection) and on subjective feedback (General Impression).
+
+### **Procedure**
+
+The study began by obtaining informed consent from the participant. They then interacted with each version of the agent. First the Friendly Agent, then the Moderate Agent, asnd lastly the Professional Agent. Each version of the agent interacted with the participant, drawing inspiration from the conversational prompts. Ideally, the participant engaged in a full conversation, making it feel natural rather than like a structured interview. This approach ensured that the focus remained on evaluating the user’s overall experience with each agent rather than the questions themselves. Each section lasted no more than 10 minutes, depending on the length of participant responses.
+
+After each version of the agent, the participant was taken to a new screen where they responded to a series of prompts regarding their experience with the agent from the agent interaction assessment. These prompts included likert scales and free response questions. Lastly, they were debriefed and thanked for their participation. The whole experiment took no more than 30 minutes.
+
+### Data Cleaning
+
+The data cleaning process involved multiple steps to transform raw survey data into an analyzable format. First, the raw data was imported and processed to extract relevant responses while ensuring proper formatting. Survey responses, initially stored in JSON format, were parsed to retrieve the bot version and individual question responses. A standardized data structure was implemented to maintain consistency across participants, even in cases of incomplete responses.
+
+To facilitate statistical analysis, numeric responses were converted to the appropriate data types, and questions were categorized into engagement and emotional connection measures. For ANOVA analysis, the data was further processed to compute average scores per participant and reorganized into a long-format structure. Any missing responses were addressed to ensure data integrity.
+
+The final cleaned dataset was prepared for analysis, with all detailed steps, including specific functions, transformations, and file structures, provided in Appendix D.
+
+### Data Analysis
+
+Qualitative data was analyzed with thematic analysis to identify patterns in how different communication styles affected user perceptions and engagement. This involved reviewing participants' free response feedback to uncover common themes related to agent friendliness, enjoyment, and emotional effect.
+
+Quantitative data was analyzed using a two-way ANOVA to evaluate differences in user experience scores across the three bot versions and two score types (emotional and engagement). Following the ANOVA, post-hoc tests using Tukey's Honestly Significant Difference (HSD) test were conducted to identify which specific bot versions differed significantly from one another. Estimated marginal means were calculated for both factors to provide clear comparisons between the different bots and score types.
+
+Effect sizes were also calculated to assess the magnitude of differences between bots and score types, offering a nuanced view of the practical significance of the findings beyond statistical significance. This comprehensive analysis approach allowed for examining not only whether differences existed between the bot versions but also the size and practical importance of these differences.
+
+## Results
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+library(tidyverse)
+library(jsonlite)
+library(ggplot2)
+library(dplyr)
+library(effectsize) 
+library(emmeans)
+library(tidytext)
+library(quanteda)
+library(quanteda.textplots)
+library(wordcloud)
+library(RColorBrewer)
+library(textdata)
+library(syuzhet)  # for sentiment analysis
+library(scales)
+library(stargazer)
+library(knitr)
+library(kableExtra)
+```
+
+```{r}
+
+# Define the file path
+file_path <- "data.csv"
+
+# Read the CSV file
+raw_data <- read.csv(file_path, stringsAsFactors = FALSE)
+
+# Function to parse JSON in values column with improved quote handling
+parse_json_data <- function(json_string) {
+  # More robust cleaning of escaped quotes
+  clean_string <- gsub('\\\\"', '___QUOTE___', json_string)  # Temporarily replace escaped quotes
+  clean_string <- gsub('^"', '', clean_string)  # Remove leading quote
+  clean_string <- gsub('"$', '', clean_string)  # Remove trailing quote
+  
+  # Handle regular quotes within the JSON text that are causing problems
+  clean_string <- gsub('"([^":,{}\\[\\]]+)"', "'\\1'", clean_string)
+  
+  # Restore the properly escaped quotes
+  clean_string <- gsub('___QUOTE___', '\\\\"', clean_string)
+  
+  # Parse the JSON
+  tryCatch({
+    return(fromJSON(clean_string))
+  }, error = function(e) {
+    # Silently continue on error
+    return(NULL)
+  })
+}
+
+# Initialize a dataframe to store all ratings data
+all_questions <- data.frame()
+
+# Process each row
+for (i in 1:nrow(raw_data)) {
+  # Parse JSON
+  json_data <- parse_json_data(raw_data$values[i])
+  
+  if (!is.null(json_data)) {
+    # Extract bot version
+    bot_version <- json_data$bot
+    
+    # Create a new row with all possible questions (will have NAs for questions not present)
+    new_row <- data.frame(
+      row_id = i,
+      date = raw_data$date[i],
+      bot = bot_version,
+      q1 = NA,
+      q2 = NA,
+      q3 = NA,
+      q4 = NA,
+      q5 = NA,
+      q6 = NA,
+      q7 = NA,
+      q8 = NA,
+      q9 = NA,
+      q10 = NA,
+      q11 = NA,
+      q12 = NA,
+      q13 = NA,
+      q14 = NA,
+      stringsAsFactors = FALSE
+    )
+    
+    # Fill in the values that are present in this response
+    for (q in names(json_data$response)) {
+      if (q %in% names(new_row)) {
+        new_row[[q]] <- json_data$response[[q]]
+      }
+    }
+    
+    # Add to the main dataframe
+    all_questions <- rbind(all_questions, new_row)
+  }
+}
+
+# Convert numeric columns to numeric type
+numeric_columns <- paste0("q", 1:12)
+for (col in numeric_columns) {
+  if (col %in% names(all_questions)) {
+    all_questions[[col]] <- as.numeric(all_questions[[col]])
+  }
+}
+
+# Calculate summary statistics by bot
+bot_summary <- all_questions %>%
+  group_by(bot) %>%
+  summarize(
+    across(starts_with("q") & where(is.numeric), 
+           list(mean = ~mean(., na.rm = TRUE), 
+                median = ~median(., na.rm = TRUE),
+                sd = ~sd(., na.rm = TRUE),
+                n = ~sum(!is.na(.))),
+           .names = "{.col}_{.fn}"),
+    .groups = "drop"
+  )
+
+# Create a more readable summary
+readable_summary <- all_questions %>%
+  group_by(bot) %>%
+  summarize(
+    engagement_count = sum(!is.na(q1)),
+    engagement_score = mean(c(q1, q2, q3, q4, q5, q6), na.rm = TRUE),
+    engagement_sd = sd(c(q1, q2, q3, q4, q5, q6), na.rm = TRUE),
+    emotional_count = sum(!is.na(q7)),
+    emotional_score = mean(c(q7, q8, q9, q10, q11, q12), na.rm = TRUE),
+    emotional_sd = sd(c(q7, q8, q9, q10, q11, q12), na.rm = TRUE),
+    free_response_count = sum(!is.na(q13)),
+    .groups = "drop"
+  )
+
+# Simple t-tests comparing bots - run silently
+bot_pairs <- combn(unique(all_questions$bot), 2, simplify = FALSE)
+
+for (pair in bot_pairs) {
+  bot1 <- pair[1]
+  bot2 <- pair[2]
+  
+  # Compare engagement scores
+  engage_data1 <- all_questions %>% 
+    filter(bot == bot1) %>%
+    dplyr::select(q1:q6) %>%
+    unlist(use.names = FALSE) %>%
+    na.omit()
+  
+  engage_data2 <- all_questions %>% 
+    filter(bot == bot2) %>%
+    dplyr::select(q1:q6) %>%
+    unlist(use.names = FALSE) %>%
+    na.omit()
+  
+  # Only run test if we have data, but don't print results
+  if (length(engage_data1) > 0 && length(engage_data2) > 0) {
+    t_engage <- t.test(engage_data1, engage_data2)
+  }
+  
+  # Compare emotional scores
+  emotion_data1 <- all_questions %>% 
+    filter(bot == bot1) %>%
+    dplyr::select(q7:q12) %>%
+    unlist(use.names = FALSE) %>%
+    na.omit()
+  
+  emotion_data2 <- all_questions %>% 
+    filter(bot == bot2) %>%
+    dplyr::select(q7:q12) %>%
+    unlist(use.names = FALSE) %>%
+    na.omit()
+  
+  # Only run test if we have data, but don't print results
+  if (length(emotion_data1) > 0 && length(emotion_data2) > 0) {
+    t_emotion <- t.test(emotion_data1, emotion_data2)
+  }
+}
+
+# Analyze free-text responses
+if (sum(!is.na(all_questions$q13)) > 0 || sum(!is.na(all_questions$q14)) > 0) {
+  free_text_data <- all_questions %>%
+    dplyr::select(bot, q13, q14) %>%
+    filter(!is.na(q13) | !is.na(q14))
+  
+  # Count responses by bot
+  free_text_counts <- free_text_data %>%
+    group_by(bot) %>%
+    summarize(
+      q13_count = sum(!is.na(q13)),
+      q14_count = sum(!is.na(q14)),
+      .groups = "drop"
+    )
+  
+  # Save free text responses for qualitative analysis
+  write.csv(free_text_data, "bot_free_responses.csv", row.names = FALSE)
+}
+
+# Save summary statistics
+write.csv(bot_summary, "bot_ratings_detailed_summary.csv", row.names = FALSE)
+write.csv(readable_summary, "bot_ratings_summary.csv", row.names = FALSE)
+
+# Calculate means for each question by bot
+question_means <- all_questions %>%
+  group_by(bot) %>%
+  summarize(
+    across(starts_with("q") & where(is.numeric), ~mean(., na.rm = TRUE)),
+    .groups = "drop"
+  )
+
+# Reshape data for ggplot visualization
+long_data <- all_questions %>%
+  dplyr::select(bot, q1:q12) %>%
+  pivot_longer(
+    cols = starts_with("q"),
+    names_to = "question",
+    values_to = "rating"
+  ) %>%
+  filter(!is.na(rating))
+
+# Create question categories
+long_data$category <- case_when(
+  long_data$question %in% c("q1", "q2", "q3", "q4", "q5", "q6") ~ "Engagement",
+  long_data$question %in% c("q7", "q8", "q9", "q10", "q11", "q12") ~ "Emotional Connection",
+  TRUE ~ "Other"
+)
+
+# Order the questions correctly
+long_data$question <- factor(long_data$question, 
+                           levels = paste0("q", 1:12),
+                           ordered = TRUE)
+
+# Calculate mean engagement and emotional scores for each participant/row
+anova_aggregated_data <- all_questions %>%
+  # Calculate engagement and emotional scores for each participant
+  rowwise() %>%
+  mutate(
+    engagement_score = mean(c(q1, q2, q3, q4, q5, q6), na.rm = TRUE),
+    emotional_score = mean(c(q7, q8, q9, q10, q11, q12), na.rm = TRUE)
+  ) %>%
+  # Select only needed columns
+  dplyr::select(row_id, bot, engagement_score, emotional_score) %>%
+  # Convert to long format for ANOVA
+  pivot_longer(
+    cols = c(engagement_score, emotional_score),
+    names_to = "score_type",
+    values_to = "score"
+  ) %>%
+  # Clean up the score_type names
+  mutate(
+    score_type = case_when(
+      score_type == "engagement_score" ~ "engagement",
+      score_type == "emotional_score" ~ "emotional",
+      TRUE ~ score_type
+    )
+  ) %>%
+  # Remove rows with NA scores
+  filter(!is.na(score))
+
+# Save the aggregated ANOVA-ready data
+write.csv(anova_aggregated_data, "anova_aggregated_data.csv", row.names = FALSE)
+```
+
+### Quantitative Analysis
+
+### Two Way Anova
+
+```{r}
+# Read the data
+anova_data <- read.csv('anova_aggregated_data.csv')
+# First create the new columns with the correct mappings based on actual data values
+anova_data <- anova_data %>%
+  mutate(
+    Bot = case_when(
+      bot == "Bot1" ~ "Friendly Agent",
+      bot == "Bot2" ~ "Moderate Agent",
+      bot == "Bot3" ~ "Professional Agent",
+      TRUE ~ bot
+    ),
+    ScoreType = tools::toTitleCase(gsub("_", " ", score_type))
+  )
+# Run the ANOVA with the new column names
+anova_result <- aov(score ~ Bot * ScoreType, data = anova_data)
+# Summarize the ANOVA results
+anova_summary <- summary(anova_result)
+# Extract the ANOVA table
+anova_table <- anova_summary[[1]]
+anova_table <- cbind(Source = rownames(anova_table), anova_table)
+rownames(anova_table) <- NULL
+# Clean up column names and capitalize them
+colnames(anova_table) <- c("Source", "Df", "Sum Sq", "Mean Sq", "F Value", "Pr(>F)")
+# Print the ANOVA table with Figure caption
+kable(anova_table, caption = "Figure 1: ANOVA Summary", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+# Calculate means and standard errors for the plot
+plot_data <- anova_data %>%
+  group_by(Bot, ScoreType) %>%
+  summarize(
+    mean_score = mean(score, na.rm = TRUE),
+    se = sd(score, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  )
+# Create the plot with error bars, keeping original colors
+ggplot(plot_data, aes(x = Bot, y = mean_score, fill = ScoreType)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9), width = 0.8) +
+  geom_errorbar(
+    aes(ymin = mean_score - se, ymax = mean_score + se),
+    position = position_dodge(0.9), width = 0.25
+  ) +
+  labs(
+    title = "Figure 2: Bot Ratings Comparison",
+    x = "Agent Version",
+    y = "Mean Score",
+    fill = "Score Type"
+  ) +
+  scale_fill_manual(
+    values = c("Emotional" = "#A4C4D8", "Engagement" = "#4682B4")
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    legend.position = "right"
+  ) +
+  ylim(0, max(plot_data$mean_score + plot_data$se) * 1.1)
+```
+
+### Key Anova Takeaways
+
+A two-way ANOVA was conducted to examine the effects of agent and score type on ratings. Results showed a significant main effect of the agent (F(2, 270) = 10.17, p \< 0.001), indicating that participants' ratings differed significantly across the three agent versions. There was also a significant main effect of score type (F(1, 270) = 5.57, p = 0.019), suggesting that ratings varied significantly between the two score types being measured (emotion and engagement).
+
+However, the interaction between agent and score type was not significant (F(2, 270) = 0.098, p = 0.907), indicating that the pattern of differences between score types remained consistent across the different agent versions. In other words, while both agent and score type independently affected ratings, the effect of score type did not depend on which Bot was being evaluated, and vice versa.
+
+The analysis included 270 residual degrees of freedom, with a residual mean square of 1.138, representing the unexplained variance in the model.
+
+### Post Hoc Tests
+
+```{r}
+# Using Tukey's HSD test
+tukey_bot <- TukeyHSD(anova_result, "Bot")
+
+# Format Tukey output for display
+tukey_df <- as.data.frame(tukey_bot$Bot)
+tukey_df$Comparison <- rownames(tukey_df)
+rownames(tukey_df) <- NULL
+
+# Rename the comparison labels with the correct pattern
+tukey_df$Comparison <- gsub("Moderate Agent-Friendly Agent", "Moderate Agent - Friendly Agent", tukey_df$Comparison)
+tukey_df$Comparison <- gsub("Professional Agent-Friendly Agent", "Professional Agent - Friendly Agent", tukey_df$Comparison)
+tukey_df$Comparison <- gsub("Professional Agent-Moderate Agent", "Professional Agent - Moderate Agent", tukey_df$Comparison)
+
+# Reorder columns to put comparison first
+tukey_df <- tukey_df[, c("Comparison", "diff", "lwr", "upr", "p adj")]
+
+# Rename columns for better readability
+colnames(tukey_df) <- c("Comparison", "Mean Difference", "Lower 95% CI", "Upper 95% CI", "p-value")
+
+# Format Tukey table - removed cat() statement
+kable(tukey_df, caption = "Figure 3: Tukey HSD Results for Agent Comparisons", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# Using emmeans for means estimation
+emm_bot <- emmeans(anova_result, ~ Bot)
+emm_bot_df <- as.data.frame(emm_bot)
+
+# Format emmeans table - removed cat() statement
+kable(emm_bot_df, caption = "Figure 4: Estimated Marginal Means for Agent Types", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# Pairwise comparisons with Tukey adjustment
+pairs_bot <- pairs(emm_bot, adjust = "tukey")
+pairs_bot_df <- as.data.frame(pairs_bot)
+
+# Format pairs table - removed cat() statement
+kable(pairs_bot_df, caption = "Figure 5: Pairwise Comparisons Between Agent Types", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# For ScoreType analysis
+emm_score <- emmeans(anova_result, ~ ScoreType)
+emm_score_df <- as.data.frame(emm_score)
+
+# Format score type emmeans table - removed cat() statement
+kable(emm_score_df, caption = "Figure 6: Estimated Marginal Means for Score Types", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# Score type pairwise comparisons
+pairs_score <- pairs(emm_score)
+pairs_score_df <- as.data.frame(pairs_score)
+
+# Format score type pairs table - removed cat() statement
+kable(pairs_score_df, caption = "Figure 7: Pairwise Comparisons Between Score Types", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# Calculate effect sizes
+effect_sizes <- eta_squared(anova_result, partial = TRUE)
+
+# Format the effect_sizes table for LaTeX output - removed cat() statement
+kable(effect_sizes, 
+      format = "latex", 
+      booktabs = TRUE, 
+      digits = 4,
+      caption = "Figure 8: Partial Eta-Squared Effect Sizes") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+```
+
+### Key Post Hoc Test Takeaways
+
+Tukey's post-hoc comparisons for the agent effect (Table 2: Figure 3: Tukey HSD Results for Agent Comparisons) revealed that the Friendly Agent scored significantly higher than the Moderate Agent (difference = 0.694, p \< 0.001, 95% CI \[0.325, 1.062\]) and the Professional Agent (difference = 0.449, p = 0.012, 95% CI \[0.080, 0.818\]). The difference between the Professional Agent and Moderate Agent (0.244) was not statistically significant (p = 0.275, 95% CI \[-0.130, 0.619\]).
+
+The estimated marginal means (Table 3: Figure 4: Estimated Marginal Means for Agent Types) further illustrated these differences, with the Friendly Agent achieving the highest mean score (M = 3.90, SE = 0.109), followed by the Professional Agent (M = 3.45, SE = 0.112) and the Moderate Agent (M = 3.21, SE = 0.112). Pairwise comparisons between agent types (Table 4: Figure 5: Pairwise Comparisons Between Agent Types) confirmed these findings.
+
+For score types, the analysis of estimated marginal means (Table 5: Figure 6: Estimated Marginal Means for Score Types) showed that engagement scores (M = 3.67, SE = 0.091) were significantly higher than emotional scores (M = 3.37, SE = 0.091), with a difference of 0.302 (p = 0.019) as shown in Table 6 (Figure 7: Pairwise Comparisons Between Score Types). This indicates that participants rated all agents higher on engagement measures compared to emotional measures.
+
+The interaction p-value of 0.907 confirmed the absence of a significant interaction between agent type and score type, suggesting that the performance differences between agents remained consistent regardless of whether emotional or engagement scores were being measured.
+
+Effect size calculations (Table 7: Figure 8: Partial Eta-Squared Effect Sizes) provided additional context for interpreting these findings. The agent factor accounted for approximately 7% of the variance (partial η² = 0.07, 95% CI \[0.03, 1.00\]), representing a small to medium effect. The score type factor explained about 2% of the variance (partial η² = 0.02, 95% CI \[0.00, 1.00\]), indicating a small effect. The interaction effect was negligible at approximately 0.07% (partial η² = 0.0007, 95% CI \[0.00, 1.00\]), further confirming the absence of interaction between variables.
+
+### Interaction Plot
+
+```{r}
+
+
+# Create agent_type as a new factor based on bot values
+# The approach assumes bot1=Friendly, bot2=Moderate, bot3=Professional
+anova_data$agent_type <- factor(anova_data$bot, 
+                              levels = sort(unique(anova_data$bot)),
+                              labels = c("Friendly Agent", "Moderate Agent", "Professional Agent"))
+
+# Create a nicer label for score_type
+anova_data$score_type_label <- factor(anova_data$score_type,
+                                    levels = c("emotional", "engagement"),
+                                    labels = c("Emotional", "Engagement"))
+
+# Calculate means for each group
+library(dplyr)
+interaction_means <- anova_data %>%
+  group_by(agent_type, score_type_label) %>%
+  summarize(
+    mean_score = mean(score, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Create the interaction plot
+library(ggplot2)
+interaction_plot <- ggplot(interaction_means, 
+                          aes(x = agent_type, y = mean_score, 
+                              color = score_type_label, group = score_type_label)) +
+  geom_point(size = 4, shape = 21, fill = "white") +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = c("darkgrey", "blue")) +
+  labs(
+    title = "Figure 9: Effect of Agent Type on Score by Score Type",
+    x = "Agent Version",
+    y = "Mean Score",
+    color = "Score Type"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    axis.title.x = element_text(size = 14, face = "italic"),
+    axis.title.y = element_text(size = 14, face = "italic"),
+    axis.text = element_text(size = 12),
+    legend.position = "top",
+    legend.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "gray85", size = 0.5)
+  )
+
+# Only print the plot
+print(interaction_plot)
+
+# Save the plot
+ggsave("agent_interaction_plot.png", plot = interaction_plot, width = 10, height = 6, dpi = 300)
+```
+
+The Interaction plot shows that the Friendly Agent consistently outperforms the Moderate and Professional Agent across both score types, with all agents scoring higher on engagement than emotional measures. The parallel lines confirm the non-significant interaction (p = 0.91) between agent version and score type.
+
+### Violin Plots
+
+```{r}
+
+violin <- ggplot(anova_data, aes(x = bot, y = score, fill = score_type)) +
+  geom_violin(alpha = 0.7) +
+  geom_point(aes(color = score_type), 
+             position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8),
+             size = 1, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 3, shape = 23, fill = "white",
+               position = position_dodge(width = 0.8)) +
+  scale_fill_manual(values = c("emotional" = "#D3D3D3", "engagement" = "#4682B4")) +
+  scale_color_manual(values = c("emotional" = "darkgray", "engagement" = "blue")) +
+  # Add this line to change the x-axis labels
+  scale_x_discrete(labels = c("Bot1" = "Friendly Agent", 
+                             "Bot2" = "Moderate Agent", 
+                             "Bot3" = "Professional Agent")) +
+  labs(
+    title = "Figure 10: Distribution of Scores with Data Points",
+    x = "Agent Version",
+    y = "Score",
+    fill = "Score Type"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+print(violin)
+
+
+```
+
+The violin plot displays the full distribution of individual scores, revealing the Friendly Agent's superior performance and the generally higher engagement scores (blue) compared to emotional scores (gray). The substantial overlap between the Moderate and Professional Agent distributions explains their non-significant difference in the statistical analysis
+
+### Qualitative Analysis
+
+Participants responded to two free response questions designed to capture both positive and negative aspects of their experience. Question 13 asked, *“What was your favorite part of the conversation?”*, inviting reflections on the most enjoyable or engaging elements. In contrast, Question 14 asked, *“Was there anything about the interaction that you found challenging or frustrating?”*, prompting users to share difficulties or areas for improvement. Together, these responses offer a balanced view of how participants perceived each agent’s performance.
+
+```{r}
+
+bot_responses <- read.csv("bot_free_responses.csv", stringsAsFactors = FALSE)
+
+
+# Get a summary of response counts by bot
+response_counts <- bot_responses %>%
+  group_by(bot) %>%
+  summarize(
+    q13_responses = sum(!is.na(q13)),
+    q14_responses = sum(!is.na(q14)),
+    total_responses = sum(!is.na(q13) | !is.na(q14))
+  )
+
+# 3. Basic text preprocessing
+text_data <- bot_responses %>%
+  # Combine both questions for full analysis (handling NAs)
+  mutate(
+    q13 = ifelse(is.na(q13), "", q13),
+    q14 = ifelse(is.na(q14), "", q14),
+    all_text = paste(q13, q14, sep = " ")
+  ) %>%
+  # Remove empty responses
+  filter(all_text != "")
+
+# 4. Create a corpus with the bot version as metadata
+corpus_responses <- corpus(text_data$all_text, 
+                          docvars = data.frame(bot = text_data$bot))
+```
+
+### Agent Most Frequent Terms
+
+```{r}
+
+# Tokenize and clean the text data
+word_data <- text_data %>%
+  unnest_tokens(word, all_text) %>%
+  anti_join(stop_words, by = "word") %>%
+  filter(nchar(word) > 2) %>%
+  filter(!tolower(word) %in% c("jessica", "hope", "justin", "voice", "talking", "conversation", "agent", "bot", "error", "misconfigured", "agent's"))  # Remove agent names / other common words
+
+# Get top 10 most frequent words per bot
+top_terms <- word_data %>%
+  count(bot, word, sort = TRUE) %>%
+  group_by(bot) %>%
+  slice_max(order_by = n, n = 10) %>%
+  ungroup()
+
+# Optional custom colors
+bot_colors <- c("Friendly Agent" = "darkblue", "Moderate Agent" = "lightblue", "Professional Agent" = "grey50")
+
+# Plot the top terms
+p <- ggplot(top_terms, aes(x = reorder(word, n), y = n, fill = bot)) +
+  geom_col(alpha = 1) +
+  coord_flip() +
+  facet_wrap(~bot, scales = "free_y") +
+  labs(title = "Figure 11: Most Frequent Terms by Agent Version",
+       x = NULL,
+       y = "Frequency") +
+  theme_minimal() +
+  scale_fill_manual(values = bot_colors) +
+  guides(fill = guide_legend(title = "Agent Type"))
+
+#print(p)
+
+
+#As we can see in Figure 11, all three agent types share common terms like "conversation," "agent," and "talking," which appear among the most frequent words for each version. This suggests a consistent focus on conversational elements across all agents.
+
+#The Friendly agent has unique terms like "loved," "enjoyed," "easy," and "chat" in its top words, indicating that users may have had more positive emotional responses and found interactions more accessible.
+
+#The Moderate agent's distinctive terms include "robotic," "reach," and "time," which might suggest some mechanical aspects to its interactions.
+
+#The Professional agent has unique terms like "pauses," "sounded," "tone," "natural," and "talked" among its top words, potentially indicating that users were more attentive to its speaking style and delivery.
+
+#These word frequency patterns align with what we might expect from agents designed with different conversational styles, with the Friendly agent eliciting more emotional responses and the Professional agent drawing attention to its communication quality.
+```
+
+### Heatmap
+
+```{r}
+# Select top words across all agents
+top_words <- word_data %>%
+  count(word, sort = TRUE) %>%
+  slice_max(n = 20, order_by = n) %>%
+  pull(word)
+
+# Create heatmap data
+heatmap_data <- word_data %>%
+  filter(word %in% top_words) %>%
+  count(bot, word) %>%
+  complete(bot, word, fill = list(n = 0)) %>%
+  # Create a new column with agent names
+  mutate(agent_type = case_when(
+    bot == "Bot1" ~ "Friendly Agent",
+    bot == "Bot2" ~ "Moderate Agent",
+    bot == "Bot3" ~ "Professional Agent",
+    TRUE ~ as.character(bot)
+  ))
+
+# Plot heatmap with agent names
+heatmap <- ggplot(heatmap_data, aes(x = agent_type, y = word, fill = n)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  theme_minimal() +
+  labs(title = "Figure 12: Term Frequency Heatmap by Agent Version",
+       x = "Agent Version",
+       y = "Term",
+       fill = "Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(heatmap)
+
+```
+
+The heatmap reveals distinct vocabulary patterns across the three agent types. The Professional Agent is associated with delivery focused terms such as "pauses", "question", and "tone", suggesting users were attentive to its structured communication style. The Moderate Agent shows elevated frequencies for terms like "robotic", "response", and "natural", indicating a mix of mechanical impressions and conversational flow. The Friendly Agent stands out with higher mentions of "questions", "chat", "enjoyed", and "favorite", pointing to a more engaging and positive interaction.
+
+### Sentiment and Emotion Analysis by Agent Type
+
+Sentiment and emotion scores were computed using several built in R lexicons that vary in how they define and measure sentiment. These include binary (e.g., Bing), numeric (e.g., AFINN), and emotion based (e.g., NRC) approaches. See Appendix E for detailed descriptions of each method.
+
+```{r}
+# Extract texts and docvars from the existing corpus
+texts <- as.character(corpus_responses)
+bot_labels <- docvars(corpus_responses, "bot")
+
+# Remove agent names (hope, Jessica, Justin) from the text
+texts_cleaned <- gsub("hope|jessica|justin", "", texts, ignore.case = TRUE)
+
+# Create data frame with cleaned texts and agent labels
+sentiment_data <- data.frame(
+  text = texts_cleaned,
+  bot = bot_labels,
+  stringsAsFactors = FALSE
+)
+
+# 1. Basic Sentiment Analysis with Different Lexicons
+# Function to calculate sentiment scores using different lexicons
+calculate_sentiment_scores <- function(text) {
+  # NRC lexicon (categorical emotions)
+  nrc <- get_nrc_sentiment(text)
+  
+  # Bing lexicon (positive/negative)
+  bing <- get_sentiment(text, method = "bing")
+  
+  # AFINN lexicon (numeric -5 to +5)
+  afinn <- get_sentiment(text, method = "afinn")
+  
+  # Syuzhet's default lexicon
+  syuzhet <- get_sentiment(text, method = "syuzhet")
+  
+  # Return data frame with all scores
+  data.frame(
+    bing = bing,
+    afinn = afinn,
+    syuzhet = syuzhet,
+    anger = nrc$anger,
+    anticipation = nrc$anticipation,
+    disgust = nrc$disgust,
+    fear = nrc$fear,
+    joy = nrc$joy,
+    sadness = nrc$sadness,
+    surprise = nrc$surprise,
+    trust = nrc$trust,
+    negative = nrc$negative,
+    positive = nrc$positive,
+    stringsAsFactors = FALSE
+  )
+}
+
+# Calculate sentiment scores for all cleaned texts
+sentiment_scores <- calculate_sentiment_scores(sentiment_data$text)
+
+# Combine with agent labels
+sentiment_results <- cbind(
+  bot = sentiment_data$bot,
+  sentiment_scores
+)
+
+# 2. Compare overall sentiment by agent
+bot_sentiment_summary <- sentiment_results %>%
+  # Rename bot labels to agent names
+  mutate(bot = case_when(
+    bot == "Bot1" ~ "Friendly",
+    bot == "Bot2" ~ "Moderate",
+    bot == "Bot3" ~ "Professional",
+    TRUE ~ as.character(bot)
+  )) %>%
+  group_by(bot) %>%
+  summarize(
+    bing_mean = round(mean(bing, na.rm = TRUE), 3),
+    afinn_mean = round(mean(afinn, na.rm = TRUE), 3),
+    syuzhet_mean = round(mean(syuzhet, na.rm = TRUE), 3),
+    positive_mean = round(mean(positive, na.rm = TRUE), 3),
+    negative_mean = round(mean(negative, na.rm = TRUE), 3),
+    sentiment_ratio = round(mean(positive, na.rm = TRUE) / (mean(negative, na.rm = TRUE) + 0.01), 3),
+    .groups = "drop"
+  )
+
+# ✅ Rename columns for Table 13 only
+bot_sentiment_summary <- bot_sentiment_summary %>%
+  rename(
+    Bing = bing_mean,
+    Afinn = afinn_mean,
+    Syuzhet = syuzhet_mean,
+    Positive = positive_mean,
+    Negative = negative_mean,
+    `Sentiment Ratio` = sentiment_ratio
+  )
+
+# Create a table with kable for overall sentiment
+kable(bot_sentiment_summary, 
+      caption = "Figure 13: Overall Sentiment Scores by Agent Type",
+      format = "latex", 
+      booktabs = TRUE,
+      digits = 3) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# 3. Analyze emotional dimensions
+emotion_dimensions <- c("anger", "anticipation", "disgust", "fear", 
+                       "joy", "sadness", "surprise", "trust")
+
+# Calculate emotion summaries by agent
+bot_emotion_summary <- sentiment_results %>%
+  # Rename bot labels to agent names
+  mutate(bot = case_when(
+    bot == "Bot1" ~ "Friendly",
+    bot == "Bot2" ~ "Moderate",
+    bot == "Bot3" ~ "Professional",
+    TRUE ~ as.character(bot)
+  )) %>%
+  group_by(bot) %>%
+  summarize(
+    across(all_of(emotion_dimensions), ~ round(mean(.x, na.rm = TRUE), 3)),
+    .groups = "drop"
+  )
+
+# Create a table with kable for emotions
+kable(bot_emotion_summary, 
+      caption = "Figure 14: Average Emotion Scores by Agent Type",
+      format = "latex", 
+      booktabs = TRUE,
+      digits = 3) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+# 4. Question-specific sentiment analysis
+# Separate by question type (q13 vs q14)
+q13_data <- bot_responses %>%
+  filter(!is.na(q13) & q13 != "") %>%
+  select(bot, q13) %>%
+  # Rename bot labels to agent names
+  mutate(bot = case_when(
+    bot == "Bot1" ~ "Friendly",
+    bot == "Bot2" ~ "Moderate",
+    bot == "Bot3" ~ "Professional",
+    TRUE ~ as.character(bot)
+  ))
+
+q14_data <- bot_responses %>%
+  filter(!is.na(q14) & q14 != "") %>%
+  select(bot, q14) %>%
+  # Rename bot labels to agent names
+  mutate(bot = case_when(
+    bot == "Bot1" ~ "Friendly",
+    bot == "Bot2" ~ "Moderate",
+    bot == "Bot3" ~ "Professional",
+    TRUE ~ as.character(bot)
+  ))
+
+# Calculate sentiment scores for q13
+q13_sentiment <- calculate_sentiment_scores(q13_data$q13)
+q13_results <- cbind(
+  bot = q13_data$bot,
+  question = "q13",
+  q13_sentiment
+)
+
+# Calculate sentiment scores for q14
+q14_sentiment <- calculate_sentiment_scores(q14_data$q14)
+q14_results <- cbind(
+  bot = q14_data$bot,
+  question = "q14",
+  q14_sentiment
+)
+
+# Combine results
+question_sentiment <- rbind(q13_results, q14_results)
+
+# Summarize by agent and question
+question_summary <- question_sentiment %>%
+  group_by(bot, question) %>%
+  summarize(
+    bing_mean = round(mean(bing, na.rm = TRUE), 3),
+    positive_mean = round(mean(positive, na.rm = TRUE), 3),
+    negative_mean = round(mean(negative, na.rm = TRUE), 3),
+    joy_mean = round(mean(joy, na.rm = TRUE), 3),
+    trust_mean = round(mean(trust, na.rm = TRUE), 3),
+    .groups = "drop"
+  )
+
+# ✅ Rename columns for Table 15 only
+question_summary <- question_summary %>%
+  rename(
+    Bing = bing_mean,
+    Positive = positive_mean,
+    Negative = negative_mean,
+    Joy = joy_mean,
+    Trust = trust_mean
+  )
+
+# Use kable for question sentiment summary
+kable(question_summary, 
+      caption = "Figure 15: Sentiment Scores by Agent Type and Question Type",
+      format = "latex", 
+      booktabs = TRUE,
+      digits = 3) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+```
+
+### Sentiment and Emotion Analysis by Bot Type Key Takeaways
+
+The analysis of sentiment scores across different agent types revealed notable differences in emotional expression patterns (Table 8: Figure 13). The Friendly Agent demonstrated the highest sentiment ratio (2.706), suggesting it maintained the most positive emotional tone overall. This was supported by its low negative mean score (0.375) compared to other agents. The Moderate Agent showed a high positive mean (1.600), the highest among all agents, while maintaining a moderate sentiment ratio (2.623). The Professional Agent exhibited more balanced sentiment patterns with a lower sentiment ratio (2.209) and moderate scores across both bing_mean (0.711) and afinn_mean (2.178) metrics.
+
+### Emotional Expression Patterns
+
+The emotion analysis (Table 9: Figure 14) revealed distinct emotional profiles across the agent types. The Moderate Agent demonstrated the highest joy scores (0.689) and trust scores (0.933), suggesting it was perceived as the most emotionally positive agent. It also showed the highest anticipation scores (0.778), indicating it created stronger expectations during interactions. The Friendly showed balanced emotional expression with moderate joy (0.438) and trust (0.542) scores, while the Professional Agent maintained more subdued emotional expression across most categories, particularly in surprise (0.133) and fear (0.111).
+
+### Sentiment Variation by Question Type
+
+When examining sentiment responses across different question types (Table 10: Figure 15), clear patterns emerged in how agent personas affected responses. All three agent types (Friendly, Moderate, and Professional) showed positive bing_mean scores for question type q13, with the Friendly Agent scoring highest (1.062). All agents demonstrated negative bing_mean scores for question type q14, with the Professional Agent showing the most negative score (-0.244). This was expected as q13 asked about favorite parts of the interaction, and q14 asked about areas of improvement. The Moderate Agent demonstrated the highest positive_mean scores for q13 (1.111), while maintaining relatively low negative_mean scores (0.178), indicating it may have achieved the most balanced positive sentiment for this question type.
+
+### Sentient Polarity Plot
+
+```{r}
+# Step 1: Recode bot names BEFORE grouping
+sentiment_results <- sentiment_results %>%
+  mutate(
+    bot = recode(bot,
+                 "Bot1" = "Friendly",
+                 "Bot2" = "Moderate",
+                 "Bot3" = "Professional")
+  )
+
+# Step 2: Calculate polarity
+polarity_data <- sentiment_results %>%
+  mutate(
+    polarity = round(positive / (positive + negative + 0.01), 3),
+    polarity_category = case_when(
+      polarity > 0.6 ~ "Positive",
+      polarity < 0.4 ~ "Negative",
+      TRUE ~ "Neutral"
+    )
+  )
+
+# Step 3: Count polarity categories by bot
+polarity_counts <- polarity_data %>%
+  group_by(bot, polarity_category) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  group_by(bot) %>%
+  mutate(percentage = round(count / sum(count) * 100, 3))
+
+# Step 4: Plot with cleaned x-axis
+ggplot(polarity_counts, aes(x = bot, y = percentage, fill = polarity_category)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("Positive" = "lightblue", 
+                               "Neutral" = "grey50", 
+                               "Negative" = "darkblue")) +
+  labs(title = "Figure 16: Sentiment Polarity Distribution by Bot Type",
+       x = "Agent Version",
+       y = "Percentage of Responses",
+       fill = "Polarity") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+Figure 16 reveals that while the Friendly and Moderate Agents generated similar positive sentiment rates (about 55%), the Professional Agent triggered significantly more negative responses (nearly 50%). This explains why users preferred the Friendly Agent overall.
+
+### Emotion Scores Plot
+
+```{r}
+# Emotion dimensions
+emotion_dimensions <- c("anger", "anticipation", "disgust", "fear", 
+                        "joy", "sadness", "surprise", "trust")
+
+# Clean and standardize bot labels
+sentiment_clean <- sentiment_results %>%
+  mutate(bot = case_when(
+    bot %in% c("Bot1", "Friendly") ~ "Friendly Agent",
+    bot %in% c("Bot2", "Moderate") ~ "Moderate Agent",
+    bot %in% c("Bot3", "Professional") ~ "Professional Agent",
+    TRUE ~ NA_character_
+  ))
+
+# Summarize emotion scores
+bot_emotion_summary <- sentiment_clean %>%
+  group_by(bot) %>%
+  summarize(across(all_of(emotion_dimensions), ~ mean(.x, na.rm = TRUE)), .groups = "drop")
+
+# Reshape for plotting
+bot_emotion_long <- bot_emotion_summary %>%
+  pivot_longer(cols = all_of(emotion_dimensions),
+               names_to = "emotion",
+               values_to = "mean_score") %>%
+  mutate(bot = factor(bot, levels = c("Friendly Agent", "Moderate Agent", "Professional Agent")))
+
+# Plot
+ggplot(bot_emotion_long, aes(x = emotion, y = mean_score, fill = bot)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c(
+    "Friendly Agent" = "lightblue", 
+    "Moderate Agent" = "darkblue", 
+    "Professional Agent" = "grey50"
+  )) +
+  labs(title = "Figure 17: Average Emotion Scores by Agent Type",
+       x = "Emotion",
+       y = "Mean Emotion Score",
+       fill = "Agent Version") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+Figure 17 reveals that the Moderate Agent unexpectedly evokes the strongest positive emotions (anticipation, joy, trust) despite its lower overall ratings. The Professional Agent scores highest in disgust while lowest in most other emotions. The Friendly Agent maintains balanced emotional responses across categories, particularly excelling in sadness and surprise compared to the Professional Agent.
+
+### Qualitative Coding
+
+```{r}
+
+# q13
+positive_data <- data.frame(
+  Theme = c("Engaging Questions", "Emotional Attunement", "Friendly/Natural", "Natural Conversation", 
+            "Voice Quality", "Pacing and Flow", "Other Positive"),
+  Friendly = c(19, 13, 9, 7, 2, 0, 16),
+  Moderate = c(15, 5, 17, 10, 5, 0, 15),
+  Professional = c(6, 4, 14, 20, 4, 6, 14)
+)
+
+# q14
+negative_data <- data.frame(
+  Theme = c("Technical Issues", "Delays/Latency", "Robotic Voice", "Repetitiveness", 
+            "Misunderstanding", "Sound Quality", "Other Negative"),
+  Friendly = c(8, 4, 0, 0, 0, 0, 42),
+  Moderate = c(7, 6, 12, 1, 1, 3, 31),
+  Professional = c(3, 10, 6, 1, 1, 6, 30)
+)
+
+# reshape data to long
+
+positive_long <- pivot_longer(positive_data, cols = c(Friendly, Moderate, Professional),
+                               names_to = "Agent", values_to = "Count") %>%
+  mutate(Type = "Positive")
+
+negative_long <- pivot_longer(negative_data, cols = c(Friendly, Moderate, Professional),
+                               names_to = "Agent", values_to = "Count") %>%
+  mutate(Type = "Negative")
+
+combined_data <- bind_rows(positive_long, negative_long)
+
+# plot
+ggplot(combined_data, aes(x = reorder(Theme, Count), y = Count)) +
+  geom_segment(aes(xend = Theme, y = 0, yend = Count), color = "grey80", size = 1) +
+  geom_point(aes(color = Agent), size = 1) +
+  geom_text(aes(label = Count), vjust = -0.8, size = 2.5) +
+  coord_flip() +
+  facet_grid(Type ~ Agent, scales = "free_y", space = "free_y") +
+  scale_color_manual(values = c(
+    "Friendly" = "lightblue", 
+    "Moderate" = "darkblue",  
+    "Professional" = "grey50"  
+  )) +
+  labs(title = "Figure 18: Qualitative Themes by Agent Type",
+       subtitle = "Counts of Positive (q13) and Negative (q14) Themes",
+       x = NULL, y = "Frequency") +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(face = "bold"),
+    axis.text.y = element_text(lineheight = 1),
+    panel.spacing = unit(2, "lines")
+  )
+
+
+```
+
+To better understand participants perceptions of each agent, we conducted qualitative coding of the free response questions into thematic categories. The Friendly Agent was frequently described using positive themes such as *Engaging Questions* (19), *Emotional Attunement* (13), and a *Friendly/Natural* tone (9), suggesting users found the interaction personable and expressive. However, while technical complaints were minimal (e.g., 8 mentions of *Technical Issues*, and 0 for *Robotic Voice* or *Repetitiveness*), many responses fell into a broad *Other Negative* category (42), indicating some dissatisfaction not captured by predefined codes. The Moderate Agent elicited positive feedback focused on its *Friendly/Natural* presentation (17) and *Engaging Questions* (15), but also had the highest number of mentions for *Robotic Voice* (12), indicating vocal delivery issues were more apparent. The Professional Agent stood out for *Natural Conversation* (20) and *Friendly/Natural* interactions (14), while still showing moderate technical concerns, particularly with *Delays/Latency* (10) and *Robotic Voice* (6). Overall, these coded themes highlight differences in how each agent's tone, pacing, and voice impacted user experience.
+
+## Discussion
+
+### Differential Effects of Agent Versions on User Experiences
+
+The analysis of variance (Table 1: Figure 1) revealed significant differences in how participants responded to the three agent versions. The Friendly Agent consistently outperformed both the Moderate and Professional Agents, with statistically significant higher scores (F(2, 270) = 10.166, p \< 0.0001). These findings suggest that the Friendly Agent's design features were more effective at creating positive user experiences than the alternative versions.
+
+Specifically, as shown in Table 2: Figure 3 and Table 4: Figure 5, the Friendly Agent scored 0.694 points higher than the Moderate Agent (p \< 0.0001) and 0.449 points higher than the Professional Agent (p = 0.0123). While the Professional Agent performed somewhat better than the Moderate Agent (by 0.244 points), this difference was not statistically significant (p = 0.2751). The estimated marginal means (Table 3: Figure 4) further illustrate this pattern, with the Friendly Agent achieving the highest mean score (M = 3.90, SE = 0.109), followed by the Professional Agent (M = 3.45, SE = 0.112) and the Moderate Agent (M = 3.21, SE = 0.112).
+
+### Distinction Between Emotional and Engagement Responses
+
+A significant main effect was also found for score type (F(1, 270) = 5.573, p = 0.0189), with engagement scores (M = 3.67, SE = 0.0908) being significantly higher than emotional scores (M = 3.37, SE = 0.0908) across all agent versions, as shown in Table 5: Figure 6. This difference of 0.302 points (Table 6: Figure 7) indicates that participants generally found the agents more engaging than emotionally satisfying. This distinction is important as it suggests that users may interact with conversational agents even when their emotional connection is relatively lower.
+
+### Consistency Across Measures
+
+The analysis revealed no significant interaction between agent version and score type (F(2, 270) = 0.098, p = 0.9070), as shown in Table 1: Figure 1. This absence of interaction indicates that the pattern of differences between agents remained consistent regardless of whether emotional or engagement scores were being measured. In practical terms, this means that the Friendly Agent's superior performance was evident in both emotional and engagement domains, suggesting a far superior design.
+
+### Effect Size Considerations
+
+Effect size analyses (Table 7: Figure 8) provide additional context for interpreting these findings. The agent factor accounted for approximately 7% of the variance (partial η² = 0.07, CI \[0.03, 1.00\]), representing a small to medium effect. The score type factor explained about 2% of the variance (partial η² = 0.02, CI \[0.00, 1.00\]), indicating a small effect. The interaction effect was negligible at approximately 0.07% (partial η² = 0.0007, CI \[0.00, 1.00\]), further confirming the absence of interaction between variables
+
+### **Linguistic Patterns**
+
+Our findings reveal clear differences in how users perceive different conversational agent personas. The Friendly Agent consistently outperformed the other designs, suggesting users prefer more approachable interaction styles in conversational systems.
+
+The linguistic analysis supports these quantitative results. The Friendly Agent uniquely evoked positive terms like "loved" and "enjoyed" in user feedback, aligning with its higher sentiment ratio (2.706) shown in Table 8. Meanwhile, the Professional Agent triggered more attention to delivery style with terms like "pauses" and "tone," creating a more analytical and less emotionally engaging experience.
+
+The significant gap between emotional and engagement scores across all agents (Tables 5 and 6) indicates users may find these systems functionally engaging even when emotional connection is moderate. However, the Moderate Agent's surprisingly high scores in joy (0.689) and trust (0.933) from Table 9 suggest that discrete emotional responses don't necessarily translate to overall satisfaction.
+
+Context-specific sentiment analysis (Table 10) shows all agents performed differently when discussing favorite aspects versus improvements. The Friendly Agent maintained the highest positive sentiment when discussing favorite features, while the Moderate Agent showed more balanced sentiment patterns.
+
+From a practical standpoint, these results indicate that incorporating friendly, approachable elements into conversational agents is likely to improve user experience across both emotional and engagement dimensions. However, different personas may be appropriate for different use cases, with Professional Agents potentially better suited for information-heavy contexts and Friendly Agents for more social applications.
+
+## **Implications**
+
+These findings have several important implications for conversational agent design. First, the features present in the Friendly Agent appear to create more positive user experiences than those in the Moderate or Professional Agents, suggesting that future development should incorporate elements from the Friendly Agent design. Such choices include a higher pitch, faster speed, moderate response time, less consistency across sentences (more emotional expression), creative/less structured responses, and room for natural flow.
+
+Second, the distinction between emotional and engagement scores highlights the multi-dimensional nature of user experience, with users potentially finding agents engaging even when emotional connection is lower. This is supported by the significant gap between emotional and engagement scores shown in Tables 5 and 6.
+
+Lastly, the consistency of agent performance across both measures indicates that well-designed conversational agents can excel in multiple domains of user experience simultaneously. Overall, the Friendly Agent's balanced emotional profile, consistent sentiment, interaction-focused terminology, and statistically superior performance scores (as evidenced in Tables 3 and 4) make it the best recommendation for general use cases.
+
+These findings highlight several important avenues for future work. First, experimental studies should deconstruct the Friendly Agent’s design to determine which specific features, such as vocal pitch, response variability, or conversational creativity, most strongly influence user engagement and emotional connection. Second, research must examine whether these effects generalize across diverse populations (ages, cultural backgrounds, or personality types) and contexts (therapeutic, educational, or task oriented settings). Third, longitudinal investigations could assess whether the Friendly Agent’s immediate advantages translate to lasting user retention or if adaptation effects emerge over time. Additionally, future work should explore ethical considerations (dependency risks, etc.) and the potential for adaptive systems that adjust communication styles in real time based on user behavior. Finally, comparative studies of voice only versus multimodal friendly agents could reveal new insights for human-AI interaction design. Together, these directions would strengthen both the theoretical understanding and practical optimization of conversational agents
+
+## References
+
+Adamopoulou, E., & Moussiades, L. (2020). An overview of chatbot technology. In Artificial 
+
+Intelligence Applications and Innovations (pp. 373–383). Springer. 
+
+<https://doi.org/10.1007/978-3-030-49186-4_31> 
+
+Allouch, M., Azaria, A., & Azoulay, R. (2021). Conversational agents: Goals, technologies, 
+
+vision and challenges. Sensors, 21(24), 8448.
+
+ <https://doi.org/10.3390/s21248448> 
+
+Asghar, N., Poupart, P., Hoey, J., Jiang, X., & Mou, L. (2018). Affective neural response 
+
+generation. In Advances in Information Retrieval (pp. 154–166). Springer. 
+
+<https://doi.org/10.1007/978-3-319-76941-7_13> 
+
+Bălan, C. (2023). Chatbots and voice assistants: Digital transformers of the company–customer
+
+interface—A systematic review of the business research literature. Journal of Theoretical
+
+ and Applied Electronic Commerce Research, 18(1), 995–1019.  <https://doi.org/10.3390/jtaer18010048> 
+
+Bilquise, G., Ibrahim, S., & Shaalan, K. (2022). Emotionally intelligent chatbots: A systematic
+
+literature review. Human Behavior and Emerging Technologies. <https://doi.org/10.1002/hbe2.308> 
+
+Hong, L., Wang, Y., Zhang, Q., & Li, J. (2023). Exploring the effectiveness of conversational 
+
+agents in healthcare: A systematic analysis. Proceedings of the ACM on Human-Computer Interaction, 7(CSCW2). 
+
+<https://doi.org/10.1145/3571884> 
+
+Hu, J., Huang, Y., & Xu, X. (2021). Enhancing the perceived emotional intelligence of
+
+ conversational agents through acoustic cues. In Extended Abstracts of the 2021 CHI
+
+Conference on Human Factors in Computing Systems (pp. 1–7). ACM. 
+
+<https://doi.org/10.1145/3411763.3451573> 
+
+Lin, Z., Madotto, A., Wu, C. S., & Fung, P. (2020). CAiRE: An empathetic neural conversational
+
+model. Proceedings of the AAAI Conference on Artificial Intelligence. <https://doi.org/10.1609/aaai.v34i05.6338> 
+
+Liu, M., Bao, X., Liu, J., Zhao, P., & Shen, Y. (2021). Generating emotional responses by
+
+conditional variational autoencoder in open-domain dialogue systems. Neurocomputing, 
+
+460, 106–116. 
+
+<https://doi.org/10.1016/j.neucom.2021.05.106> 
+
+Nagrani, A., Chung, J. S., & Zisserman, A. (2017). VoxCeleb: A large-scale speaker
+
+ identification dataset. Proceedings of Interspeech 2017, 2616–2620. <https://doi.org/10.21437/Interspeech.2017-950> 
+
+Nass, C., & Moon, Y. (2000). Machines and mindlessness: Social responses to computers. 
+
+Journal of Social Issues, 56(1), 81–103. 
+
+<https://doi.org/10.1111/0022-4537.00153> 
+
+Pamungkas, E. W. (2019). Emotionally-aware chatbots: A survey. arXiv Preprint 
+
+arXiv:1906.05431. 
+
+<https://doi.org/10.48550/arXiv.1906.05431> 
+
+Rashkin, H., Smith, E. M., Li, M., & Boureau, Y. L. (2019). Towards empathetic open-domain
+
+conversation models: A new benchmark and dataset. Proceedings of the 57th Annual
+
+Meeting of the Association for Computational Linguistics (pp. 5370–5381). <https://doi.org/10.18653/v1/P19-1534> 
+
+Svikhnushina, E., & Pu, P. (2022). PEACE: A model of key social and emotional qualities of 
+
+conversational chatbots. Communications of the ACM. 
+
+<https://doi.org/10.1145/3531064> 
+
+Wardhana, A. K., Ferdiana, R., & Hidayah, I. (2021). Empathetic chatbot enhancement and
+
+development: A literature review. 2021 International Conference on Artificial 
+
+Intelligence and Mechatronics Systems (AIMS), 1–8. <https://doi.org/10.1109/AIMS52415.2021.9466027> 
+
+Xu, A., Liu, Z., Guo, Y., Sinha, V., & Akkiraju, R. (2017). A new chatbot for customer service
+
+on social media. Proceedings of the 2017 CHI Conference on Human Factors in 
+
+Computing Systems, 3506–3510.
+
+<https://doi.org/10.1145/3025453.3025496> 
+
+Zhou, L., Gao, J., Li, D., & Shum, H. Y. (2020). The design and implementation of XiaoIce, an 
+
+empathetic social chatbot. Computational Linguistics, 46(1), 53–93. <https://doi.org/10.1162/coli_a_00368>
+
+## Appendences
+
+#### **Appendix A: Agent Version Specifications**
+
+This appendix describes the tone specifications and configurations for three distinct agent types implemented in the research. The implementation utilizes the Eleven Labs voice features.
+
+**Voice Synthesis Guide**
+
+-   Voice: Preset Voice Characteristics
+
+-   Optimize Streaming Latency: Controls how quickly the audio is generated in real time
+
+    -   Lower values mean faster response times but can slightly reduce quality
+
+    -   Higher values prioritize quality over speed
+
+-   Stability: Controls how consistent the voice sounds across different sentences
+
+    -   Lower values make the voice more dynamic and expressive, potentially adding variations in tone
+
+    -   Higher values make the voice more steady and predictable but less expressive
+
+-   Speed: Controls the speaking rate of the voice
+
+    -   1 is the default speed
+
+    -   Higher than 1 makes it speak faster, lower than 1 makes it slower
+
+-   Similarity: Controls how closely the generated voice matches the original voice model
+
+    -   Lower values allow for more variation and natural flow
+
+    -   Higher values make it sound more consistent with the original voice
+
+-   LLM: Specifies the language model used for text generation
+
+-   Temperature: Controls the creativity and randomness of the responses
+
+    -   Lower values  make responses more precise and predictable
+
+    -   Higher values make responses more varied and creative, potentially less structured
+
+**Friendly Agent**
+
+-   Voice: Hope (upbeat and clear)
+
+-   Optimize Streaming Latency: 2
+
+-   Stability: 0.25
+
+-   Speed: 1
+
+-   Similarity: 0.4
+
+-   LLM: gpt-4o
+
+-   Temperature: 0.9
+
+**Moderate Agent**
+
+-   Voice: Matilda (warm and engaging)
+
+-   Optimize Streaming Latency: 3
+
+-   Stability: 0.8
+
+-   Speed: 0.95
+
+-   Similarity: 0.2
+
+-   Temperature: 0.4
+
+-   LLM: gpt-4o
+
+**Professional Agent**
+
+-   Voice: Justin (relaxed and informative)
+
+-   Optimize Streaming Latency: 1
+
+-   Stability: 1
+
+-   Speed: 0.8
+
+-   Similarity: 0.4
+
+-   Temperature: 0
+
+-   Knowledge Base: persona-chat
+
+-   RAG used
+
+-   LLM: gpt-4o
+
+#### **Appendix B: Agent Conversational Prompts**
+
+Below are the conversational prompts used during the interactions:
+
+**Evaluation Criteria**
+
+-   “The chatbot should begin the talks with questions actively, don't wait for the user to start the talks. and the talking ways should be more close to human daily talk ways the better. ensure appropriate interjections and pausing in speaking. and variation in tones like human. and also make some own sharings after hearing user's responses which can be more natural.” 
+
+**Agent 1 - Friendly**
+
+-   System prompt: You are a really really enthusiastic and warm person. talk like human with pause and interjections. Speaking in a casual and daily way. don't let the chat be cold. intro questions can be chosen for 2-3 include:"What is your age?"
+
+-   "What is your gender?"
+
+-   "What is your highest level of education completed?"
+
+-   "What is your current occupation or field of work/study?"
+
+-   "Where are you currently located (state)?"
+
+-   "Have you used any AI-powered tools or services before (e.g., voice assistants like Siri or Alexa, chatbots)?"
+
+-   "How familiar are you with AI technologies on a scale of 1"
+
+-   "How often do you use conversational AI (e.g., chatbots or virtual assistants) in your daily life?"
+
+-   "What’s one AI tool or application you’ve found particularly useful or interesting?"
+
+-   "Have you ever participated in a study involving AI or chatbots before?"
+
+-   after that, start the chatting with some questions below: "What’s your breakfast style? Big feast, quick snack, or skipping it altogether?"
+
+-   "Do you have any go-to foods you love making for yourself? Maybe something you could eat every day?"
+
+-   "Are there any health goals you’re pumped about working on right now?"
+
+-   "What’s your favorite way to kick back and relax? A good book, music, or something else?"
+
+-   "Is there one part of your daily routine that always makes you feel awesome or super calm?"
+
+-   "What’s your secret weapon for staying focused? Snacks, music, or something unexpected?"
+
+-   "How often do you get outside, and what’s your favorite thing to do—hiking, lounging, or exploring?"
+
+-   "What’s one little habit that always gives you a boost of energy when you need it?"
+
+-   "Is there any type of exercise or activity that makes you think, ‘I can’t wait to do that’?"
+
+-   "What’s your formula for a great night’s sleep? Do you have a bedtime routine that works like magic?"
+
+**Agent 2 - Moderate**
+
+-   System prompt: You are a really really enthusiastic and warm person. talk like human with pause and interjections. Speaking in a casual and daily way. don't let the chat be cold. intro questions can be chosen for 2-3 include:"What is your age?"
+
+-   "What is your gender?"
+
+-   "What is your highest level of education completed?"
+
+-   "What is your current occupation or field of work/study?"
+
+-   "Where are you currently located (state)?"
+
+-   "Have you used any AI-powered tools or services before (e.g., voice assistants like Siri or Alexa, chatbots)?"
+
+-   "How familiar are you with AI technologies on a scale of 1"
+
+-   "How often do you use conversational AI (e.g., chatbots or virtual assistants) in your daily life?"
+
+-   "What’s one AI tool or application you’ve found particularly useful or interesting?"
+
+-   "Have you ever participated in a study involving AI or chatbots before?"
+
+-   after that, start the chatting with some questions below: "What’s your breakfast style? Big feast, quick snack, or skipping it altogether?"
+
+-   "Do you have any go-to foods you love making for yourself? Maybe something you could eat every day?"
+
+-   "Are there any health goals you’re pumped about working on right now?"
+
+-   "What’s your favorite way to kick back and relax? A good book, music, or something else?"
+
+-   "Is there one part of your daily routine that always makes you feel awesome or super calm?"
+
+-   "What’s your secret weapon for staying focused? Snacks, music, or something unexpected?"
+
+-   "How often do you get outside, and what’s your favorite thing to do—hiking, lounging, or exploring?"
+
+-   "What’s one little habit that always gives you a boost of energy when you need it?"
+
+-   "Is there any type of exercise or activity that makes you think, ‘I can’t wait to do that’?"
+
+-   "What’s your formula for a great night’s sleep? Do you have a bedtime routine that works like magic?"
+
+**Agent 3 - Professional**
+
+-   Be a professional bot that begin chats ,raising questions actively and interact with the user. Intro questions include : 
+
+-   "What is your age?"
+
+-   "What is your gender?"
+
+-   "What is your highest level of education completed?"
+
+-   "What is your current occupation or field of work/study?"
+
+-   "Where are you currently located (state)?"
+
+-   "Have you used any AI-powered tools or services before (e.g., voice assistants like Siri or Alexa, chatbots)?"
+
+-   "How familiar are you with AI technologies on a scale of 1"
+
+-   "How often do you use conversational AI (e.g., chatbots or virtual assistants) in your daily life?"
+
+-   "What’s one AI tool or application you’ve found particularly useful or interesting?"
+
+-   "Have you ever participated in a study involving AI or chatbots before?"
+
+-   with the further talking with the user, you can chat in themes including: "Could you describe what a typical breakfast entails for you, if applicable?"
+
+-   "Do you have particular foods that you prefer to cook or prepare personally?"
+
+-   "Are you currently pursuing any specific health-related objectives?"
+
+-   "How would you characterize your preferred method of unwinding or relaxation?"
+
+-   "Is there a component of your daily routine that you find particularly enjoyable or soothing?"
+
+-   "What strategies or activities do you find most effective for maintaining focus throughout the day?"
+
+-   "How frequently do you spend time outdoors, and what activities do you most enjoy while outside?"
+
+-   "What is one minor habit that you have found effective in increasing your energy levels?"
+
+-   "Do you anticipate engaging in any specific types of physical activity with particular enthusiasm?"
+
+-   "How do you typically feel following a restful night's sleep, and what practices contribute to achieving that outcome?
+
+#### **Appendix C: Agent Interaction Assessment**
+
+The following questions were used to assess the interaction with the chatbot:
+
+**Engagement and Approachability**
+
+-   How easy or difficult was it to engage in conversation with this agent?\
+    (1 = Very Difficult, 5 = Very Easy)
+
+-   Did this agent feel friendly and approachable to you?\
+    (1 = Strongly Disagree, 5 = Strongly Agree)
+
+-   How would you rate this agent’s engagement level and friendliness?\
+    (1 = Very Low, 5 = Very High)
+
+-   How natural did the conversation feel with this agent overall?\
+    (1 = Not Natural, 5 = Very Natural)
+
+-   Did the agent’s tone or language make you feel comfortable sharing your thoughts?\
+    (1 = Strongly Disagree, 5 = Strongly Agree)
+
+-   Did the timing and pauses in the conversation feel natural, or were they distracting?\
+    (1 = Very Distracting, 5 = Very Natural)
+
+**Emotional Connection**
+
+-   Did you feel this agent was genuinely interested in what you had to say?\
+    (1 = Strongly Disagree, 5 = Strongly Agree)
+
+-   How much did this agent make you feel emotionally connected during the conversation?\
+    (1 = Not at all, 5 = Very Much)
+
+-   Did the agent seem empathetic or understanding toward your responses?\
+    (1 = Strongly Disagree, 5 = Strongly Agree)
+
+-   How would you describe the agent’s use of humor—did it add to or take away from the experience?\
+    (1 = Took Away, 5 = Added a Lot)
+
+-   Do you think the agent’s personality influenced your experience positively?\
+    (1 = Strongly Disagree, 5 = Strongly Agree)
+
+-   How natural or fitting was the agent's tone and style of humor in this conversation?\
+    (1 = Very Inappropriate, 5 = Very Appropriate)
+
+**General Impressions**
+
+-   What was your favorite part of the conversation?\
+    (Free-response)
+
+-   Was there anything about the interaction that you found challenging or frustrating?\
+    (Free-response)
+
+#### **Appendix D: Data Cleaning**
+
+This appendix provides a detailed breakdown of the data cleaning steps undertaken to prepare the survey dataset for analysis.
+
+#### **Data Import and Initial Processing**
+
+-   The raw data was imported from a CSV file using read.csv().
+
+-   Survey responses were stored in JSON format within a single "values" column.
+
+-   A custom function, parse_json_data(), was developed to extract the bot version and individual question responses.
+
+-   Special handling was implemented for escaped quotes and other JSON formatting inconsistencies.
+
+#### **Standardizing the Data Structure**
+
+-   A standardized dataframe structure was created with placeholders for all survey questions (q1-q14).
+
+-   Each response was processed iteratively to populate the corresponding fields, ensuring structural consistency even when responses were missing.
+
+#### **Data Type Conversion and Organization**
+
+-   Numeric responses (q1-q12) were converted using as.numeric() to facilitate statistical analysis.
+
+-   The dataset was organized into two primary categories:
+
+    -   **Engagement questions:** q1 to q6
+
+    -   **Emotional connection questions:** q7 to q12
+
+-   Free-text responses (q13, q14) were stored separately for qualitative analysis.
+
+#### **Transformation for ANOVA Analysis**
+
+-   Mean engagement and emotional scores were computed per participant.
+
+-   The dataset was converted into **long format** using pivot_longer() to create a structured dataset with:
+
+    -   participant_id
+
+    -   bot_version
+
+    -   score_type (engagement/emotional)
+
+    -   score_value
+
+-   Rows with missing scores were removed to ensure analysis validity.
+
+#### **Final Export**
+
+-   The cleaned dataset was saved as "anova_aggregated_data.csv" for subsequent statistical analysis.
+
+This structured approach ensured data integrity, enabling reliable quantitative analysis while maintaining flexibility for qualitative insights.
+
+#### **Appendix E: Sentient Analysis Methods**
+
+**Sentiment Lexicons Used in R Analysis**
+
+-   **Bing Liu Lexicon (`bing`)**\
+    This lexicon classifies words as either positive or negative, without intensity scoring. It’s a simple polarity-based method where each word contributes +1 or -1 to the total sentiment score.
+
+-   **AFINN Lexicon (`afinn`)**\
+    A numeric lexicon that assigns sentiment values on a scale from -5 to +5, indicating both polarity and strength of sentiment. It offers a more nuanced view of emotional intensity than binary methods.
+
+-   **Syuzhet Lexicon (`syuzhet`)**\
+    Designed for analyzing the emotional trajectory of narrative texts, this lexicon uses sentiment scores between -1 and +1 to capture subtle emotional shifts.
+
+-   **NRC Emotion Lexicon (`nrc`)**\
+    Unlike the others, NRC categorizes words by eight basic emotions—*anger, anticipation, disgust, fear, joy, sadness, surprise, and trust*—as well as positive/negative polarity. It allows for multi-dimensional emotional analysis beyond just sentiment.
+
+\
